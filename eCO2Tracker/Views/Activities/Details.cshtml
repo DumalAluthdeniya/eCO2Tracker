@@ -1,0 +1,95 @@
+﻿@model eCO2Tracker.Models.Activity
+
+@{
+	ViewData["Title"] = "Details";
+}
+
+<div>
+	@Html.HiddenFor(model => model.Category)
+	@Html.HiddenFor(model => model.Units)
+	@Html.HiddenFor(model => model.Id)
+
+	<h4>@Model.Name</h4>
+	<hr />
+	<dl class="row">
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.Name)
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Name)
+		</dd>
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.Description)
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Description)
+		</dd>
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.Units)
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Units)
+		</dd>
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.Category)
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Category)
+		</dd>
+	</dl>
+</div>
+<div>
+	<a id="btnPerform" class="btn btn-success">Perform</a> |
+	<a class="btn btn-danger" asp-action="Delete" asp-route-id="@Model.Id">Delete</a> |
+	<a class="btn btn-info" asp-action="Index">Back to List</a>
+</div>
+
+<div id="performmodal" class="modal" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Good Job !!</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<p id="message"></p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts{
+	<script>
+		$("#btnPerform").on('click', function () {
+			var cat = $("#Category").val();
+			var units = $("#Units").val();
+			var unit = cat === "Food" ? 'kilograms' : cat === "Water" ? 'Letres' : 'kW';
+			$("#message").text(units + " " + unit + " of " + cat + " saved.");
+			$("#performmodal").modal();
+			UpdateDataBase($("#Id").val())
+		})
+
+		function UpdateDataBase(id) {
+			$.ajax({
+				type: 'POST',
+				url: '/Activities/UpdatePerformedStatus',
+				data: { id: id },
+				cache: false,
+				success: function (result) {
+					// disable express option if delivery type is Electronic
+					if (result == "Mail") {
+						console.log("Updated succesfully!");
+					} else {
+						console.log("Error occured!");
+					}
+				}
+			});
+		}
+	</script>
+}
